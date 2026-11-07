@@ -687,3 +687,4 @@ export const AdminResourcesPage: React.FC = () => {
     </article>
   );
 };
+

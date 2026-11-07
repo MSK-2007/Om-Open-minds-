@@ -500,3 +500,4 @@ export const AdminAnnouncementsPage: React.FC = () => {
     </article>
   );
 };
+

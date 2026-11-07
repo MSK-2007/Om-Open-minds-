@@ -532,3 +532,4 @@ export const AdminFacilitiesPage: React.FC = () => {
     </article>
   );
 };
+

@@ -1,0 +1,1461 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
+// Read canonical HTML
+const canonical = fs.readFileSync('public/landing-pages/meng-to-sketchbook.canonical.html', 'utf8');
+
+// Build the school version
+const schoolHtml = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OM OPEN MINDS — Specialized School Sketchbook</title>
+<meta name="description" content="OM OPEN MINDS — An inclusive educational sanctuary dedicated to children's learning, growth, independence, and individual potential.">
+<style>
+@font-face{font-family:'Instrument Serif';font-style:normal;font-weight:400;font-display:block;
+  src:url(meng-to-sketchbook/instrument-serif.woff2) format('woff2')}
+@font-face{font-family:'Instrument Serif';font-style:italic;font-weight:400;font-display:block;
+  src:url(meng-to-sketchbook/instrument-serif-italic.woff2) format('woff2')}
+@font-face{font-family:'Newsreader';font-style:normal;font-weight:200 600;font-display:swap;
+  src:url(meng-to-sketchbook/newsreader.woff2) format('woff2')}
+
+:root{
+  --paper:#f5f0e6;
+  --ink:#302b26;
+  --ink-soft:rgba(48,43,38,.58);
+  --ink-faint:rgba(48,43,38,.36);
+  --hairline:rgba(48,43,38,.14);
+  --earth:#c77b61;
+  --botanical:#78866b;
+  --sage:#dce3d2;
+  --soft-yellow:#e8d79a;
+  --display:'Instrument Serif',"New York",Georgia,'Times New Roman',serif;
+  --font:'Newsreader',"New York",Georgia,'Times New Roman',serif;
+  --track-caps:.24em;
+  --track-nav:.06em;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--paper);color:var(--ink);font-family:var(--font);font-size:18px;line-height:1.55;font-feature-settings:"cv02","cv03","cv04","cv09","cv11";-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+html{scroll-behavior:smooth}
+body{overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button{background:none;border:none;color:inherit;font:inherit;cursor:pointer}
+::selection{background:var(--ink);color:var(--paper)}
+
+/* the painted ground the whole page sits on */
+.wash{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:url(meng-to-sketchbook/bg-wash.jpg) 50% 0 / 1600px auto repeat-y;
+  opacity:.65;
+}
+.wash:after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle 800px at 50% 28%,transparent 40%,var(--paper) 100%);
+  opacity:.7;
+}
+
+/* ---------------- top bar ---------------- */
+.top{
+  position:relative;z-index:10;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:34px 44px 22px;
+  font-family:var(--font);
+  font-size:15px;
+  font-weight:300;
+  letter-spacing:var(--track-nav);
+  flex-wrap:wrap;
+  gap:16px;
+}
+.top>*{position:relative}
+.top:before{
+  content:'';position:absolute;left:44px;right:44px;bottom:0;height:1px;
+  background:var(--hairline);
+}
+.top .name{
+  font-family:var(--display);
+  font-size:28px;
+  font-weight:400;
+  letter-spacing:.02em;
+  color:var(--ink);
+  transition:color .2s ease;
+}
+.top .name:hover{color:var(--earth)}
+.top nav{display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.top nav a{color:var(--ink-soft);transition:color .2s ease;padding:4px 0}
+.top nav a:hover,.top nav a[aria-current]{color:var(--ink)}
+.top nav .top-portal{
+  color:var(--earth);font-weight:600;padding:6px 14px;
+  border:1px solid var(--earth);border-radius:20px;
+  transition:all .2s ease;
+}
+.top nav .top-portal:hover{background:var(--earth);color:#ffffff}
+
+/* ---------------- hero ---------------- */
+.hero{
+  position:relative;z-index:1;
+  padding:20px 24px 70px;
+  display:flex;flex-direction:column;align-items:center;
+}
+.botany{
+  position:absolute;top:0;pointer-events:none;user-select:none;
+  opacity:.78;z-index:1;width:min(28vw,380px);max-width:380px;height:auto;
+}
+.botany.l{left:0;transform-origin:top left}
+.botany.r{right:0;transform-origin:top right}
+
+.hero-kicker{
+  margin-top:10px;
+  font-family:var(--font);
+  font-size:13px;
+  letter-spacing:var(--track-caps);
+  text-transform:uppercase;
+  color:var(--ink-faint);
+  text-align:center;
+  font-weight:400;
+}
+
+/* ---------------- 3D sketchbook viewport ---------------- */
+.sb-wrap{
+  position:relative;
+  width:100%;max-width:1160px;
+  margin:28px auto 0;
+  perspective:1700px;
+  -webkit-perspective:1700px;
+}
+.sb-stage{
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  padding:24px 0 10px;
+  touch-action:none;
+}
+.sb-arrow{
+  position:relative;z-index:5;
+  width:44px;height:80px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--ink-faint);
+  transition:color .2s ease,transform .2s ease;
+}
+.sb-arrow:hover{color:var(--ink);transform:scale(1.08)}
+.sb-arrow:active{transform:scale(.95)}
+.sb-arrow.left{margin-right:-8px}
+.sb-arrow.right{margin-left:-8px}
+
+.sb-3d{
+  position:relative;
+  width:min(90vw,960px);
+  aspect-ratio:1760/1240;
+  transform-style:preserve-3d;
+  -webkit-transform-style:preserve-3d;
+  --rx:0deg; --ry:0deg; --zoom:1;
+}
+.sb-tilt{
+  position:absolute;inset:0;
+  transform-style:preserve-3d;
+  -webkit-transform-style:preserve-3d;
+  transform:rotateX(var(--rx)) rotateY(var(--ry)) scale(var(--zoom));
+  transform-origin:50% 50%;
+  transition:transform .12s cubic-bezier(0,0,.2,1);
+}
+
+/* realistic book shadows on the desk */
+.sb-cast{position:absolute;inset:0;pointer-events:none}
+.sb-cast.ambient{
+  inset:8% 4% -10%;
+  background:radial-gradient(ellipse at 50% 50%,rgba(38,32,24,.32) 0%,rgba(38,32,24,.18) 42%,rgba(38,32,24,0) 72%);
+  filter:blur(36px);
+  transform:translateZ(-40px);
+}
+.sb-cast.contact{
+  inset:3% 3% -4%;
+  background:radial-gradient(ellipse at 50% 50%,rgba(38,32,24,.44) 0%,rgba(38,32,24,.22) 50%,rgba(38,32,24,0) 74%);
+  filter:blur(14px);
+  transform:translateZ(-15px);
+}
+.sb-cast.hair{
+  inset:1% 1% -1%;
+  box-shadow:0 30px 60px -15px rgba(35,28,20,.38), 0 12px 24px -10px rgba(35,28,20,.25);
+  border-radius:14px;
+}
+
+.sb-book{
+  position:absolute;inset:0;
+  transform-style:preserve-3d;
+  -webkit-transform-style:preserve-3d;
+  user-select:none;-webkit-user-select:none;
+}
+.sb-full{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.sb-full img{
+  width:100%;height:100%;object-fit:contain;
+  pointer-events:none;
+}
+.sb-half{
+  position:absolute;top:0;bottom:0;width:50%;overflow:hidden;
+}
+.sb-half.left{left:0}
+.sb-half.right{right:0}
+.sb-half img{
+  position:absolute;top:0;height:100%;max-width:none;width:200%;
+  pointer-events:none;object-fit:contain;
+}
+.sb-half.left img{left:0}
+.sb-half.right img{right:-100%}
+
+.gutter-shade{
+  position:absolute;top:0;bottom:0;width:22%;pointer-events:none;
+}
+.gutter-shade.left{
+  right:0;background:linear-gradient(to left,rgba(35,28,20,calc(var(--shade)*.45)) 0%,rgba(35,28,20,0) 100%);
+}
+.gutter-shade.right{
+  left:0;background:linear-gradient(to right,rgba(35,28,20,calc(var(--shade)*.45)) 0%,rgba(35,28,20,0) 100%);
+}
+
+/* ---------------- 18-strip curling paper leaf ---------------- */
+.curl{
+  position:absolute;top:0;bottom:0;
+  width:calc(var(--bw) * var(--span) / var(--n));
+  transform-style:preserve-3d;-webkit-transform-style:preserve-3d;
+}
+.curl.next{left:50%;transform-origin:0% 50%}
+.curl.prev{right:50%;transform-origin:100% 50%}
+.strip{
+  position:absolute;top:0;bottom:0;left:100%;width:100%;
+  transform-style:preserve-3d;-webkit-transform-style:preserve-3d;
+  transform:rotateY(var(--td));
+  transform-origin:0% 50%;
+}
+.curl.prev .strip{left:auto;right:100%;transform-origin:100% 50%}
+.curl.next{transform:rotateY(var(--tt))}
+.curl.prev{transform:rotateY(calc(-1 * var(--tt)))}
+
+.face{
+  position:absolute;inset:0;
+  background-size:var(--bw) 100%;
+  background-repeat:no-repeat;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;
+}
+.face.front{transform:rotateY(0deg)}
+.face.back{transform:rotateY(180deg)}
+.face .sh{position:absolute;inset:0;background:#000;opacity:var(--a1)}
+.face .gl{position:absolute;inset:0;background:#fff;opacity:calc((1 - var(--lit)) * .18)}
+.face.back .sh{opacity:var(--a2)}
+
+/* invisible click/drag zones */
+.sb-zone{
+  position:absolute;top:0;bottom:0;width:50%;z-index:4;
+  cursor:ew-resize;background:transparent;
+}
+.sb-zone.sb-prev{left:0}
+.sb-zone.sb-next{right:0}
+
+/* ---------------- zoom layer & magnifying glass ---------------- */
+.zoomwrap{
+  position:absolute;inset:0;pointer-events:none;z-index:6;
+  opacity:0;transition:opacity .2s ease;
+}
+.zoominner{
+  position:absolute;inset:0;
+  transform-origin:0 0;
+}
+.loupe{
+  position:absolute;top:0;left:0;
+  width:var(--lr,220px);height:var(--lr,220px);
+  pointer-events:auto;cursor:grab;z-index:8;
+  opacity:0;transition:opacity .25s ease;
+  user-select:none;touch-action:none;
+}
+.loupe.on{opacity:1}
+.loupe.held{cursor:grabbing}
+.loupe .ring{
+  position:absolute;inset:0;border-radius:50%;
+  border:4px solid #3c342a;
+  box-shadow:0 16px 36px -6px rgba(25,18,10,.5), inset 0 2px 6px rgba(255,255,255,.35), inset 0 -4px 10px rgba(0,0,0,.45);
+}
+.loupe .ring:before{
+  content:'';position:absolute;inset:-3px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.25);
+}
+.loupe .lens{
+  position:absolute;inset:0;border-radius:50%;
+  overflow:hidden;
+  background:radial-gradient(circle at 35% 25%,rgba(255,255,255,.3) 0%,rgba(255,255,255,0) 60%);
+}
+.loupe .grip{
+  position:absolute;right:-48px;bottom:-48px;width:76px;height:24px;
+  background:linear-gradient(135deg,#5e4630,#2c1e14);
+  border-radius:12px;
+  transform:rotate(45deg);transform-origin:left center;
+  box-shadow:0 10px 20px rgba(0,0,0,.35);
+}
+
+/* captions & tools */
+.sb-captions{
+  margin-top:20px;min-height:36px;
+  display:flex;align-items:center;justify-content:center;
+  text-align:center;
+}
+.sb-caption{
+  font-family:var(--display);
+  font-size:24px;
+  color:var(--ink);
+  letter-spacing:.02em;
+}
+.sb-caption.live{position:absolute}
+
+.sb-tools{
+  margin-top:14px;
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(245,240,230,.75);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  padding:4px 12px;border-radius:24px;
+  border:1px solid var(--hairline);
+}
+.sb-tools .tool{
+  width:32px;height:32px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--ink-soft);border-radius:50%;
+  transition:all .2s ease;
+}
+.sb-tools .tool:hover{color:var(--ink);background:rgba(48,43,38,.06)}
+.sb-tools .tool:disabled{opacity:.3;cursor:not-allowed}
+.sb-tools .tool-sep{width:1px;height:16px;background:var(--hairline);margin:0 2px}
+.sb-tools .zoom-read{font-size:13px;color:var(--ink-soft);min-width:44px;text-align:center;font-variant-numeric:tabular-nums}
+.sb-tools .tool svg{width:18px;height:18px}
+
+.sb-hint{
+  margin-top:12px;font-size:13px;color:var(--ink-faint);
+  letter-spacing:.04em;text-align:center;transition:opacity .3s ease;
+}
+.sb-hint.gone{opacity:0;pointer-events:none}
+
+.hero-down{
+  margin-top:40px;color:var(--ink-faint);
+  transition:color .2s ease,transform .2s ease;
+}
+.hero-down:hover{color:var(--ink);transform:translateY(4px)}
+
+/* ---------------- Editorial Rules & Dividers ---------------- */
+.rule{
+  width:100%;max-width:960px;margin:20px auto;height:1px;
+  background:var(--hairline);
+}
+.rule.short{max-width:320px;margin:48px auto}
+
+/* ---------------- Sections ---------------- */
+.editorial-section{
+  max-width:960px;margin:0 auto;padding:48px 24px;
+  position:relative;z-index:2;
+}
+.section-label{
+  font-family:var(--font);font-size:12px;letter-spacing:var(--track-caps);
+  text-transform:uppercase;color:var(--earth);margin-bottom:14px;font-weight:600;
+}
+.section-heading{
+  font-family:var(--display);font-size: clamp(32px, 4vw, 44px);
+  line-height:1.2;color:var(--ink);margin-bottom:20px;
+}
+.editorial-lead{
+  font-size:20px;line-height:1.6;color:var(--ink-soft);margin-bottom:28px;
+}
+
+/* Plate Index Grid */
+.plate-list{
+  list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));
+  gap:20px;margin-top:24px;
+}
+.plate-card-btn{
+  width:100%;text-align:left;
+  padding:20px 22px;background:#faf7f0;
+  border:1px solid #e2d9cb;border-radius:10px;
+  transition:all .25s cubic-bezier(0,0,.2,1);
+  display:flex;flex-direction:column;gap:8px;
+  box-shadow:0 4px 12px rgba(48,43,38,.03);
+}
+.plate-card-btn:hover{
+  background:#ffffff;border-color:var(--earth);
+  transform:translateY(-2px);box-shadow:0 8px 20px rgba(48,43,38,.08);
+}
+.plate-card-btn[aria-current="true"]{
+  background:#ffffff;border-color:var(--botanical);
+  box-shadow:0 0 0 2px var(--botanical);
+}
+.plate-card-btn .p-meta{
+  display:flex;justify-content:space-between;align-items:center;
+}
+.plate-card-btn .p-num{
+  font-family:var(--display);font-size:18px;color:var(--earth);font-weight:600;
+}
+.plate-card-btn .p-tag{
+  font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);
+}
+.plate-card-btn .p-title{
+  font-family:var(--display);font-size:22px;color:var(--ink);line-height:1.25;
+}
+.plate-card-btn .p-desc{
+  font-size:14px;color:var(--ink-soft);line-height:1.45;
+}
+
+/* Programmes & Facilities Cards */
+.cards-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;margin-top:28px;
+}
+.school-card{
+  background:#faf7f0;border:1px solid #e0d6c5;border-radius:10px;padding:26px 24px;
+  display:flex;flex-direction:column;justify-content:space-between;gap:16px;
+  transition:transform .2s ease,border-color .2s ease;
+}
+.school-card:hover{border-color:var(--earth);transform:translateY(-2px)}
+.school-card h3{font-family:var(--display);font-size:24px;color:var(--ink);line-height:1.2}
+.school-card p{font-size:16px;color:var(--ink-soft);line-height:1.55}
+.school-card .badge{
+  align-self:flex-start;font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+  padding:4px 10px;border-radius:12px;background:var(--sage);color:var(--botanical);font-weight:600;
+}
+.school-card .highlights{
+  list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px;
+}
+.school-card .highlights li{
+  font-size:14px;color:var(--ink-faint);display:flex;align-items:center;gap:8px;
+}
+.school-card .highlights li:before{
+  content:'•';color:var(--earth);font-weight:bold;
+}
+
+/* Interactive Forms */
+.form-box{
+  background:#ffffff;border:1px solid #ded5c5;border-radius:12px;padding:36px;
+  box-shadow:0 10px 30px rgba(48,43,38,.06);margin-top:24px;
+}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.form-group{display:flex;flex-direction:column;gap:8px}
+.form-group.full{grid-column:1 / -1}
+.form-label{font-size:14px;font-weight:600;color:var(--ink);letter-spacing:.02em}
+.form-input,.form-textarea{
+  font-family:var(--font);font-size:16px;padding:12px 16px;border:1px solid #d8cebe;
+  border-radius:6px;background:#faf7f0;color:var(--ink);transition:all .2s ease;
+}
+.form-input:focus,.form-textarea:focus{
+  outline:none;border-color:var(--earth);background:#ffffff;box-shadow:0 0 0 3px rgba(199,123,97,.15);
+}
+.form-textarea{resize:vertical;min-height:110px}
+.form-btn{
+  align-self:flex-start;padding:14px 32px;background:var(--earth);color:#ffffff;
+  border-radius:30px;font-family:var(--font);font-size:16px;font-weight:500;
+  cursor:pointer;transition:all .2s ease;margin-top:12px;
+}
+.form-btn:hover{background:#b36b53;transform:translateY(-1px)}
+.form-btn:active{transform:translateY(1px)}
+.form-status{margin-top:16px;font-size:15px;padding:12px 16px;border-radius:6px;display:none}
+.form-status.success{display:block;background:#e9f4e8;color:#2c6b29;border:1px solid #b7dcb3}
+.form-status.error{display:block;background:#fbeeed;color:#a83227;border:1px solid #f2bdb7}
+
+/* Footer */
+.foot{
+  text-align:center;padding:48px 24px 64px;font-size:15px;color:var(--ink-faint);
+  letter-spacing:.04em;position:relative;z-index:2;
+}
+.foot a{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+
+/* Accessibility & Reduced Motion */
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important;transition-duration:.01ms !important}
+  html{scroll-behavior:auto}
+}
+@media(max-width:768px){
+  .top{padding:20px;flex-direction:column;align-items:flex-start}
+  .form-grid{grid-template-columns:1fr}
+  .sb-arrow{display:none}
+  .sb-tools{padding:2px 8px}
+}
+</style>
+</head>
+
+<body data-ready="0">
+
+<div class="wash" aria-hidden="true"></div>
+
+<!-- Top Navigation -->
+<header class="top" role="banner">
+  <a class="name" href="#sketchbook">OM OPEN MINDS</a>
+  <nav role="navigation" aria-label="Main Navigation">
+    <a href="#sketchbook">Sketchbook</a>
+    <a href="#plates">Editorial Index</a>
+    <a href="#about">Our Story</a>
+    <a href="#programmes">Programmes</a>
+    <a href="#approach">Our Approach</a>
+    <a href="#facilities">Facilities</a>
+    <a href="#educators">Educators</a>
+    <a href="#activities">Activities</a>
+    <a href="#admissions">Admissions</a>
+    <a href="#contact">Contact</a>
+    <a href="/admin/login" class="top-portal" target="_blank" rel="noopener noreferrer">Admin Portal</a>
+  </nav>
+</header>
+
+<!-- Main Sketchbook Experience -->
+<main class="page home" role="main">
+
+  <section id="sketchbook" class="hero" aria-label="Interactive School Sketchbook">
+    <img class="botany l" src="meng-to-sketchbook/botany-left.png" alt="" aria-hidden="true">
+    <img class="botany r" src="meng-to-sketchbook/botany-right.png" alt="" aria-hidden="true">
+
+    <p class="hero-kicker">Specialized Education · Individual Potential · Inclusive Growth</p>
+
+    <div class="sb-wrap" id="sbWrap">
+      <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <filter id="sb-mblur-1"><feGaussianBlur stdDeviation="5 0"/></filter>
+        <filter id="sb-mblur-2"><feGaussianBlur stdDeviation="14 0"/></filter>
+      </svg>
+      <div class="sb-stage" id="sbStage">
+        <button class="sb-arrow left" id="sbLeft" aria-label="Previous plate">
+          <svg viewBox="0 0 14 44" width="14" height="44" fill="none" aria-hidden="true"><polyline points="11,3 3,22 11,41" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="sb-3d" id="sb3d">
+          <div class="sb-tilt" id="sbTilt">
+            <div class="sb-cast ambient" aria-hidden="true"></div>
+            <div class="sb-cast contact" aria-hidden="true"></div>
+            <div class="sb-cast hair" aria-hidden="true"></div>
+            <div class="sb-book" id="sbBook"></div>
+          </div>
+          <div class="zoomwrap" id="zoomWrap" aria-hidden="true"><div class="zoominner" id="zoomInner"></div></div>
+          <div class="loupe" id="loupe" role="region" aria-label="Magnifying glass"><span class="grip"></span><span class="ring"><span class="lens" id="loupeLens"><span class="mag" id="loupeMag"></span></span></span></div>
+        </div>
+        <button class="sb-arrow right" id="sbRight" aria-label="Next plate">
+          <svg viewBox="0 0 14 44" width="14" height="44" fill="none" aria-hidden="true"><polyline points="3,3 11,22 3,41" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="sb-captions" id="sbCaptions"></div>
+      <div class="sb-tools" role="group" aria-label="Sketchbook Controls">
+        <button class="tool" id="zOut" aria-label="Zoom out"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8.6" cy="8.6" r="5.6"/><path d="M12.8 12.8 17.4 17.4M6.2 8.6h4.8"/></svg></button>
+        <span class="zoom-read" id="zRead">100%</span>
+        <button class="tool" id="zIn" aria-label="Zoom in"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8.6" cy="8.6" r="5.6"/><path d="M12.8 12.8 17.4 17.4M6.2 8.6h4.8M8.6 6.2v4.8"/></svg></button>
+        <span class="tool-sep" aria-hidden="true"></span>
+        <button class="tool" id="loupeBtn" aria-label="Toggle Magnifier" aria-pressed="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8.8" cy="8.8" r="5.8"/><path d="M13 13l4.4 4.4"/><path d="M6.4 7.2a3.2 3.2 0 0 1 2.4-1.4" opacity=".55"/></svg></button>
+      </div>
+      <p class="sb-hint" id="sbHint">Drag page edge or arrow keys to turn · Drag glass across illustrations</p>
+    </div>
+
+    <button class="hero-down" id="heroDown" aria-label="Scroll to editorial content">
+      <svg viewBox="0 0 44 22" width="34" height="17" fill="none" aria-hidden="true">
+        <polyline points="3,3 22,11 41,3" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="3,11 22,19 41,11" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </section>
+
+  <div class="rule" aria-hidden="true"></div>
+
+  <!-- Editorial Index (9 Plates) -->
+  <section id="plates" class="editorial-section" aria-labelledby="plates-title">
+    <p class="section-label">Editorial Index</p>
+    <h2 id="plates-title" class="section-heading">Nine School Sketchbook Plates</h2>
+    <p class="editorial-lead">Select any plate below to turn the open sketchbook directly to that chapter.</p>
+    <ol class="plate-list" id="plateList"></ol>
+  </section>
+
+  <div class="rule short" aria-hidden="true"></div>
+
+  <!-- About & Story Section -->
+  <section id="about" class="editorial-section" aria-labelledby="about-title">
+    <p class="section-label">Our Story & Identity</p>
+    <h2 id="about-title" class="section-heading">Every Journey Begins with Understanding</h2>
+    <p class="editorial-lead">Welcome to OM OPEN MINDS — an educational sanctuary dedicated to children with diverse learning needs, neurodivergent conditions, and developmental challenges.</p>
+    <div style="display:flex;gap:36px;align-items:flex-start;flex-wrap:wrap">
+      <div style="flex:1;min-width:300px">
+        <p style="margin-bottom:16px;color:var(--ink-soft)">At OM OPEN MINDS, we believe education must adapt to the child, not force the child to fit a rigid mould. Every student possesses unique intellectual sparks, communication styles, and creative potential.</p>
+        <p style="color:var(--ink-soft)">Through structured routines, evidence-based pedagogy, sensory balance, and continuous parent-educator dialogue, we build an unshakeable foundation for lifelong dignity and functional independence.</p>
+      </div>
+      <img class="bloom" src="meng-to-sketchbook/bloom.png" alt="" aria-hidden="true" style="width:140px;height:auto;opacity:.85">
+    </div>
+  </section>
+
+  <div class="rule short" aria-hidden="true"></div>
+
+  <!-- Learning Programmes Section (Connected to Supabase) -->
+  <section id="programmes" class="editorial-section" aria-labelledby="prog-title">
+    <p class="section-label">Learning Programmes</p>
+    <h2 id="prog-title" class="section-heading">Learning That Recognises Every Individual</h2>
+    <p class="editorial-lead">Our approved learning pathways, calibrated to each student's developmental readiness and sensory profile.</p>
+    <div class="cards-grid" id="programmesContainer">
+      <!-- Default verified pathways (updated dynamically from Supabase) -->
+      <div class="school-card">
+        <div>
+          <span class="badge">Ages 4–8</span>
+          <h3 style="margin-top:12px">Early Developmental Readiness</h3>
+          <p style="margin-top:8px">Multi-sensory engagement, fine & gross motor coordination, communicative cues, and social play skills.</p>
+        </div>
+        <ul class="highlights">
+          <li>Sensory integration routines</li>
+          <li>Pre-academic numeracy & shapes</li>
+          <li>Guided emotional regulation</li>
+        </ul>
+      </div>
+      <div class="school-card">
+        <div>
+          <span class="badge">Ages 8–14</span>
+          <h3 style="margin-top:12px">Adaptive Foundational Academics</h3>
+          <p style="margin-top:8px">Personalized literacy, functional mathematics, digital assisted learning, and peer cooperative projects.</p>
+        </div>
+        <ul class="highlights">
+          <li>TEACCH-structured visual tasks</li>
+          <li>Augmentative & Alternative Communication</li>
+          <li>1:3 Educator-to-student support</li>
+        </ul>
+      </div>
+      <div class="school-card">
+        <div>
+          <span class="badge">Ages 14+</span>
+          <h3 style="margin-top:12px">Practical Life & Independence Skills</h3>
+          <p style="margin-top:8px">Self-care, domestic living competency, community exploration, and vocational confidence building.</p>
+        </div>
+        <ul class="highlights">
+          <li>Domestic tasks & cooking lab</li>
+          <li>Community travel & money skills</li>
+          <li>Pre-vocational workshop crafts</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="rule short" aria-hidden="true"></div>
+
+  <!-- Our Approach Section -->
+  <section id="approach" class="editorial-section" aria-labelledby="approach-title">
+    <p class="section-label">Educational Approach</p>
+    <h2 id="approach-title" class="section-heading">Different Ways to Learn. Endless Ways to Grow.</h2>
+    <p class="editorial-lead">Our multi-sensory teaching philosophy combines empathy, patience, and evidence-based structure.</p>
+    <div class="cards-grid">
+      <div class="school-card">
+        <h3>Individual Learning Support</h3>
+        <p>Customized IEP goals formulated in partnership with parents, tracking every micro-milestone with positive reinforcement.</p>
+      </div>
+      <div class="school-card">
+        <h3>Total Communication</h3>
+        <p>Honoring every form of expression: spoken words, visual cards (PECS), sign approximations, and assistive technology.</p>
+      </div>
+      <div class="school-card">
+        <h3>Sensory Calibration</h3>
+        <p>Predictable sensory breaks, quiet alcoves, and movement diets that ensure children feel safe and receptive to learning.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="rule short" aria-hidden="true"></div>
+
+  <!-- Facilities Section (Connected to Supabase) -->
+  <section id="facilities" class="editorial-section" aria-labelledby="fac-title">
+    <p class="section-label">Our Campus Spaces</p>
+    <h2 id="fac-title" class="section-heading">Spaces That Encourage Discovery</h2>
+    <p class="editorial-lead">Specially architected sensory, therapeutic, and learning environments.</p>
+    <div class="cards-grid" id="facilitiesContainer">
+      <div class="school-card">
+        <span class="badge">Sensory Therapy</span>
+        <h3>Multisensory Relaxation Studio</h3>
+        <p>Calming fibre optics, vibro-acoustic floor mats, and gentle soothing soundscapes designed for sensory decompression.</p>
+      </div>
+      <div class="school-card">
+        <span class="badge">Gross Motor</span>
+        <h3>Adaptive Movement Hall</h3>
+        <p>Padded soft-play obstacles, therapeutic balance swings, and low-impact obstacle courses fostering balance and coordination.</p>
+      </div>
+      <div class="school-card">
+        <span class="badge">Nature & Botany</span>
+        <h3>Therapeutic Botanical Courtyard</h3>
+        <p>Raised herb gardens, fragrant lavender walkways, and quiet outdoor shaded reading corners with tactile gravel paths.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="rule short" aria-hidden="true"></div>
+
+  <!-- Educators Section (Connected to Supabase) -->
+  <section id="educators" class="editorial-section" aria-labelledby="team-title">
+    <p class="section-label">Faculty & Mentors</p>
+    <h2 id="team-title" class="section-heading">People Who Make a Difference</h2>
+    <p class="editorial-lead">Dedicated special educators, therapy consultants, and supportive paraprofessionals.</p>
+    <div class="cards-grid" id="teamContainer">
+      <div class="school-card">
+        <h3>Special Education Faculty</h3>
+        <p style="color:var(--earth);font-size:14px;font-weight:600">Head of Curriculum & Special Pedagogy</p>
+        <p>Accredited in Special Education with extensive expertise in developmental delays, autism spectrum profiles, and IEP architecture.</p>
+      </div>
+      <div class="school-card">
+        <h3>Sensory & Motor Mentors</h3>
+        <p style="color:var(--earth);font-size:14px;font-weight:600">Developmental Support Leads</p>
+        <p>Guiding daily sensory integration exercises, motor circuits, and adaptive communication technology across classrooms.</p>
+      </div>
+      <div class="school-card">
+        <h3>Holistic Life Skills Coaches</h3>
+        <p style="color:var(--earth);font-size:14px;font-weight:600">Practical Autonomy Mentors</p>
+        <p>Fostering domestic competence, community engagement, and social peer fellowship with patience and joy.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="rule short" aria-hidden="true"></div>
+
+  <!-- Activities Section (Connected to Supabase) -->
+  <section id="activities" class="editorial-section" aria-labelledby="act-title">
+    <p class="section-label">Activities & Milestones</p>
+    <h2 id="act-title" class="section-heading">Little Moments. Meaningful Milestones.</h2>
+    <p class="editorial-lead">Celebrations of effort, community fellowship, and joyous developmental milestones.</p>
+    <div class="cards-grid" id="activitiesContainer">
+      <div class="school-card">
+        <span class="badge">Celebration</span>
+        <h3>Annual Sports & Play Day</h3>
+        <p>Non-competitive, inclusive games tailored so every child crosses the finish line surrounded by applause.</p>
+      </div>
+      <div class="school-card">
+        <span class="badge">Creative Expression</span>
+        <h3>Botanical Art & Clay Showcase</h3>
+        <p>Student artwork and pottery exhibition celebrating individual tactile expression and creative imagination.</p>
+      </div>
+      <div class="school-card">
+        <span class="badge">Community</span>
+        <h3>Family Fellowship Circles</h3>
+        <p>Informal weekend gatherings where parents, siblings, and educators exchange stories, support, and friendship.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="rule short" aria-hidden="true"></div>
+
+  <!-- Admissions & Contact Section (Live Supabase Forms) -->
+  <section id="admissions" class="editorial-section" aria-labelledby="adm-title">
+    <p class="section-label">Admissions & Contact</p>
+    <h2 id="adm-title" class="section-heading">Let's Begin This Journey Together</h2>
+    <p class="editorial-lead">We welcome parents and caregivers to begin with a confidential enquiry or arrange a gentle campus walkthrough.</p>
+
+    <!-- Admission Enquiry Form -->
+    <div class="form-box">
+      <h3 style="font-family:var(--display);font-size:26px;margin-bottom:6px">Schedule an Admissions Consultation</h3>
+      <p style="color:var(--ink-soft);font-size:15px;margin-bottom:24px">Our admissions director will contact you directly within 2 business days.</p>
+      
+      <form id="admissionForm" novalidate>
+        <!-- Honeypot -->
+        <input type="text" name="hp_field" style="display:none" tabindex="-1" autocomplete="off">
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="parent_name">Parent / Guardian Full Name *</label>
+            <input class="form-input" id="parent_name" name="parent_name" type="text" required placeholder="e.g. Meera Sharma">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="contact_phone">Contact Telephone *</label>
+            <input class="form-input" id="contact_phone" name="contact_phone" type="tel" required placeholder="+91 98765 43210">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="contact_email">Email Address *</label>
+            <input class="form-input" id="contact_email" name="contact_email" type="email" required placeholder="guardian@example.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="child_age">Child's Approximate Age *</label>
+            <input class="form-input" id="child_age" name="child_age" type="text" required placeholder="e.g. 7 years">
+          </div>
+          <div class="form-group full">
+            <label class="form-label" for="enquiry_notes">General Learning Goals or Questions (Non-medical)</label>
+            <textarea class="form-textarea" id="enquiry_notes" name="enquiry_notes" placeholder="Please share any general questions or developmental goals you would like to discuss with our educators..."></textarea>
+          </div>
+        </div>
+        <button type="submit" class="form-btn" id="admBtn">Submit Admission Enquiry</button>
+        <div id="admStatus" class="form-status" role="alert"></div>
+      </form>
+    </div>
+
+    <!-- Quick Contact Details -->
+    <div id="contact" style="margin-top:40px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:24px">
+      <div>
+        <p class="section-label">Campus Location</p>
+        <p style="color:var(--ink);font-weight:500" id="schoolAddress">OM OPEN MINDS Campus, Special Education Zone</p>
+        <p style="color:var(--ink-soft);font-size:15px">Visiting Hours: Monday – Friday, 9:00 AM – 3:30 PM (By prior appointment)</p>
+      </div>
+      <div>
+        <p class="section-label">Direct Communication</p>
+        <p style="color:var(--ink)">Email: <a href="mailto:admissions@omopenminds.edu" id="schoolEmail" style="text-decoration:underline">admissions@omopenminds.edu</a></p>
+        <p style="color:var(--ink)">Phone: <span id="schoolPhone">+91 (0) 80 2345 6789</span></p>
+      </div>
+    </div>
+  </section>
+
+  <div class="rule short" aria-hidden="true"></div>
+
+  <!-- Footer -->
+  <footer class="foot" role="contentinfo">
+    <p>© 2026 OM OPEN MINDS · Specialized School for Diverse Learners · Designed with ThreeUI Sketchbook Architecture</p>
+  </footer>
+
+</main>
+
+<script>
+/* =====================================================================
+   OM OPEN MINDS — Interactive Sketchbook
+   Curled paper page turning, 18-strip geometry, draggable 2.3x loupe,
+   spring physics, and 9 verified school plates.
+   ===================================================================== */
+const Q = new URLSearchParams(location.search);
+const DIR = 'meng-to-sketchbook/';
+const PAGES = [
+  { file: 'plate-01-welcome.svg',    title: 'Welcome to OM OPEN MINDS',           place: 'Plate 01 · Educational Sanctuary' },
+  { file: 'plate-02-story.svg',      title: 'Our Story & Philosophy',            place: 'Plate 02 · Founding Journey' },
+  { file: 'plate-03-vision.svg',     title: 'Vision & Institutional Mission',    place: 'Plate 03 · Core Purpose' },
+  { file: 'plate-04-programmes.svg', title: 'Specialized Learning Programmes',   place: 'Plate 04 · Individual Pathways' },
+  { file: 'plate-05-approach.svg',   title: 'Our Teaching Approach',             place: 'Plate 05 · Pedagogy & Care' },
+  { file: 'plate-06-facilities.svg', title: 'Adaptive Learning Facilities',      place: 'Plate 06 · Sensory Environments' },
+  { file: 'plate-07-educators.svg',  title: 'Our Dedicated Educators',           place: 'Plate 07 · Faculty & Mentors' },
+  { file: 'plate-08-activities.svg', title: 'Activities & Meaningful Milestones',place: 'Plate 08 · Celebrations & Growth' },
+  { file: 'plate-09-admissions.svg', title: 'Admissions & Campus Inquiries',     place: 'Plate 09 · Begin This Journey' }
+];
+PAGES.forEach(p => p.url = DIR + p.file);
+const M = PAGES.length, LAND = 0;
+
+const wrap = document.getElementById('sbWrap');
+const stage = document.getElementById('sbStage');
+const sb3d = document.getElementById('sb3d');
+const book = document.getElementById('sbBook');
+const capBox = document.getElementById('sbCaptions');
+const hint = document.getElementById('sbHint');
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ------------------------------------------------ the turning leaf */
+const N = 18;            /* strips — enough for a smooth curve          */
+const SPAN = 0.449;      /* gutter → outer page edge, as a fraction     */
+const BETA = 0.60;       /* peak curl of the arc, radians              */
+let idx = 0, turn = null;  /* turn = {dir, from, to, t}                   */
+let strips = [];         /* the chain, kept for per-frame lighting       */
+
+function el(t, c){ const e = document.createElement(t); if(c) e.className = c; return e; }
+function imgEl(i, side){
+  const im = new Image(); im.className = 'sb-half-img ' + side;
+  im.draggable = false; im.alt = PAGES[i].title; im.src = PAGES[i].url; return im;
+}
+
+function halfEl(pos, i){
+  const d = el('div', 'sb-half ' + pos);
+  d.appendChild(imgEl(i, pos));
+  d.appendChild(el('div', 'gutter-shade ' + pos));
+  return d;
+}
+
+function buildCurl(dir, from, to){
+  strips = [];
+  const c = el('div', 'curl ' + dir);
+  c.style.setProperty('--n', N);
+  c.style.setProperty('--span', SPAN);
+  let host = c;
+  for(let i = 0; i < N; i++){
+    const s = el('div', 'strip');
+    s.style.setProperty('--i', i);
+    const gut = 'calc(var(--bw) * 0.5)';
+    const sw = 'calc(var(--bw) * ' + SPAN + ' / ' + N + ')';
+    const A = 'calc(-1 * (' + gut + ' + ' + i + ' * ' + sw + '))';
+    const B = 'calc(' + (i + 1) + ' * ' + sw + ' - ' + gut + ')';
+    const f = el('div', 'face front'), b = el('div', 'face back');
+    const dress = (e, url, px) => {
+      e.style.backgroundImage = 'url(' + url + ')';
+      e.style.backgroundPositionX = px;
+    };
+    dress(f, PAGES[from].url, dir === 'next' ? A : B);
+    dress(b, PAGES[to].url,   dir === 'next' ? B : A);
+    f.appendChild(el('div', 'sh')); f.appendChild(el('div', 'gl'));
+    b.appendChild(el('div', 'sh')); b.appendChild(el('div', 'gl'));
+    s.appendChild(f); s.appendChild(b);
+    if(i === N - 1) s.classList.add('edge');
+    host.appendChild(s); host = s;
+    strips.push(s);
+  }
+  return c;
+}
+
+function applyTurn(t){
+  const th = Math.PI * t;
+  const beta = BETA * Math.sin(Math.PI * t);
+  const D = 180 / Math.PI;
+  const tt = th + beta, td = 2 * beta / N;
+  sb3d.style.setProperty('--tt', (tt * D).toFixed(2) + 'deg');
+  sb3d.style.setProperty('--td', (td * D).toFixed(3) + 'deg');
+  sb3d.style.setProperty('--shade', Math.sin(Math.PI * t).toFixed(3));
+  fadeCaption(t);
+  for(let i = 0; i < strips.length; i++){
+    const l1 = Math.abs(Math.cos(tt - i * td));
+    const l2 = Math.abs(Math.cos(tt - (i + 1) * td));
+    const st = strips[i].style;
+    st.setProperty('--lit', l1.toFixed(3));
+    st.setProperty('--a1', ((1 - l1) * .62).toFixed(3));
+    st.setProperty('--a2', ((1 - l2) * .62).toFixed(3));
+  }
+}
+
+function paint(){
+  book.textContent = '';
+  if(!turn){
+    const f = el('div', 'sb-full');
+    const im = new Image(); im.src = PAGES[idx].url; im.alt = PAGES[idx].title;
+    im.draggable = false;
+    f.appendChild(im); book.appendChild(f);
+    sb3d.style.setProperty('--shade', '0');
+  }else{
+    const next = turn.dir === 'next';
+    book.appendChild(halfEl('left', next ? turn.from : turn.to));
+    book.appendChild(halfEl('right', next ? turn.to : turn.from));
+    book.appendChild(buildCurl(turn.dir, turn.from, turn.to));
+    applyTurn(turn.t);
+  }
+  const a = el('button', 'sb-zone sb-prev'), b = el('button', 'sb-zone sb-next');
+  a.setAttribute('aria-label', 'Previous page'); b.setAttribute('aria-label', 'Next page');
+  book.appendChild(a); book.appendChild(b);
+  layout();
+  caption();
+  marks();
+  if(typeof syncZoomLayer === 'function') syncZoomLayer();
+  if(typeof placeLoupe === 'function') placeLoupe();
+}
+
+function caption(){
+  capBox.textContent = '';
+  capOut = capIn = null;
+  if(turn){
+    capOut = el('p', 'sb-caption live'); capOut.textContent = PAGES[turn.from].title; capBox.appendChild(capOut);
+    capIn = el('p', 'sb-caption live'); capIn.textContent = PAGES[turn.to].title; capBox.appendChild(capIn);
+    fadeCaption(turn.t);
+  }else{
+    const p = el('p', 'sb-caption'); p.textContent = PAGES[idx].title; capBox.appendChild(p);
+  }
+}
+let capOut = null, capIn = null;
+function fadeCaption(t){
+  if(!capOut || !capIn) return;
+  const out = 1 - Math.max(0, Math.min(1, (t - 0.10) / 0.28));
+  const inn = Math.max(0, Math.min(1, (t - 0.56) / 0.30));
+  capOut.style.opacity = out.toFixed(3);
+  capIn.style.opacity = inn.toFixed(3);
+}
+
+function layout(){
+  sb3d.style.setProperty('--bw', book.clientWidth + 'px');
+}
+addEventListener('resize', layout);
+
+/* ------------------------------------------------------ spring loop */
+let spring = null;
+function animateTo(target, onDone, stiff, damp){
+  spring = { kind: 'spring', v: 0, target: target, done: onDone, k: stiff || 150, c: damp || 22 };
+  kick();
+}
+function tweenTo(target, dur, onDone){
+  spring = { kind: 'tween', from: turn ? turn.t : 0, target: target, dur: dur, e: 0, done: onDone };
+  kick();
+}
+let raf = null, last = 0;
+function tick(now){
+  raf = null;
+  const dt = Math.min(0.032, (now - last) / 1000 || 0.016); last = now;
+  if(spring && turn){
+    const s = spring;
+    if(s.kind === 'tween'){
+      s.e += dt;
+      const k = Math.min(1, s.e / s.dur);
+      turn.t = s.from + (s.target - s.from) * k;
+      applyTurn(turn.t);
+      if(k >= 1){ spring = null; const d = s.done; d && d(); }
+    }else{
+      const x = turn.t - s.target;
+      s.v += (-s.k * x - s.c * s.v) * dt;
+      turn.t += s.v * dt;
+      if(Math.abs(turn.t - s.target) < 0.002 && Math.abs(s.v) < 0.02){
+        turn.t = s.target; spring = null;
+        applyTurn(turn.t);
+        const d = s.done; d && d();
+      }else applyTurn(turn.t);
+    }
+  }
+  viewSpring();
+  const lmoved = loupeEase();
+  if((spring || viewActive || lmoved) && raf === null) raf = requestAnimationFrame(tick);
+}
+function kick(){ if(raf === null){ last = performance.now(); raf = requestAnimationFrame(tick); } }
+
+/* ------------------------------------------- tilt + zoom of the book */
+const TILT_X = 4.5, TILT_Y = 7;
+const ZOOM_MIN = 0.9, ZOOM_MAX = 1.5;
+const view = { rx: 0, ry: 0, z: 1, trx: 0, try_: 0, tz: 1 };
+let viewActive = false;
+let lastZ = 1;
+
+function applyView(){
+  sb3d.style.setProperty('--rx', view.rx.toFixed(2) + 'deg');
+  sb3d.style.setProperty('--ry', view.ry.toFixed(2) + 'deg');
+  sb3d.style.setProperty('--zoom', view.z.toFixed(3));
+  if(view.z !== lastZ){ lastZ = view.z; if(typeof placeLoupe === 'function') placeLoupe(); }
+}
+
+function viewSpring(){
+  const e = 0.14;
+  let moved = false;
+  for(const [k, t] of [['rx', 'trx'], ['ry', 'try_'], ['z', 'tz']]){
+    const d = view[t] - view[k];
+    if(Math.abs(d) > 0.0006){ view[k] += d * e; moved = true; }
+    else view[k] = view[t];
+  }
+  if(moved) applyView();
+  viewActive = moved;
+  return moved;
+}
+
+function setView(rx, ry, z){
+  view.trx = Math.max(-TILT_X, Math.min(TILT_X, rx));
+  view.try_ = Math.max(-TILT_Y, Math.min(TILT_Y, ry));
+  view.tz = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, z));
+  viewActive = true; kick();
+  if(typeof syncZoom === 'function') syncZoom();
+}
+
+function tiltTo(cx, cy){
+  if(drag) return;
+  const r = book.getBoundingClientRect();
+  if(!r.width) return;
+  const nx = Math.max(-1, Math.min(1, (cx - (r.left + r.width / 2)) / (r.width * 0.62)));
+  const ny = Math.max(-1, Math.min(1, (cy - (r.top + r.height / 2)) / (r.height * 0.9)));
+  setView(-ny * TILT_X, nx * TILT_Y, view.tz);
+}
+
+addEventListener('pointermove', e => {
+  if(e.pointerType === 'touch') return;
+  tiltTo(e.clientX, e.clientY);
+}, { passive: true });
+addEventListener('pointerout', e => { if(!e.relatedTarget) setView(0, 0, view.tz); });
+addEventListener('blur', () => setView(0, 0, view.tz));
+stage.addEventListener('dblclick', () => setView(view.trx, view.try_, 1));
+
+/* ------------------------------------------------------- pointer work */
+let drag = null;
+function bookRect(){ return book.getBoundingClientRect(); }
+function hideHint(){ hint.classList.add('gone'); }
+
+stage.addEventListener('pointerdown', e => {
+  if(e.button !== 0) return;
+  e.preventDefault();
+  const onBook = e.target.closest('.sb-zone');
+  stage.setPointerCapture(e.pointerId);
+  hideHint();
+  if(!onBook || introOn) return;
+  const r = bookRect();
+  const dir = (e.clientX - r.left) / r.width > 0.5 ? 'next' : 'prev';
+  startTurn(dir, 0);
+  drag = { dir: dir, x0: e.clientX, w: r.width, moved: 0, vel: 0, tPrev: performance.now() };
+});
+
+stage.addEventListener('pointermove', e => {
+  if(!drag) return;
+  const dx = e.clientX - drag.x0;
+  drag.moved = Math.max(drag.moved, Math.abs(dx));
+  const raw = (drag.dir === 'next' ? -dx : dx) / (drag.w * 0.62);
+  const t = Math.max(0, Math.min(1, raw));
+  const now = performance.now();
+  drag.vel = (t - (turn ? turn.t : 0)) / Math.max(0.001, (now - drag.tPrev) / 1000);
+  drag.tPrev = now;
+  if(turn){ turn.t = t; applyTurn(t); }
+});
+
+function endDrag(e){
+  if(!drag) return;
+  const d = drag; drag = null;
+  if(!turn) return;
+  if(d.moved < 6){ commit(); return; }
+  const go = turn.t > 0.42 || d.vel > 1.1;
+  if(go) commit(); else cancel();
+}
+
+stage.addEventListener('dragstart', e => e.preventDefault());
+stage.addEventListener('selectstart', e => e.preventDefault());
+stage.addEventListener('pointerup', endDrag);
+stage.addEventListener('pointercancel', endDrag);
+
+/* ------------------------------------------------------ turn control */
+function startTurn(dir, t){
+  spring = null;
+  if(turn){ idx = turn.to; turn = null; }
+  if(typeof shoveLoupe === 'function') shoveLoupe(dir);
+  const from = idx;
+  turn = { dir: dir, from: from, to: dir === 'next' ? (from + 1) % M : (from - 1 + M) % M, t: t || 0 };
+  paint();
+}
+
+function commit(){
+  if(!turn) return;
+  if(REDUCED){ idx = turn.to; turn = null; paint(); return; }
+  animateTo(1, () => { idx = turn.to; turn = null; paint(); }, 170, 26);
+  kick();
+}
+
+function cancel(){
+  if(!turn) return;
+  animateTo(0, () => { turn = null; paint(); }, 150, 24);
+  kick();
+}
+
+function step(dir){
+  if(introOn) endIntro();
+  if(turn){ idx = turn.to; turn = null; }
+  startTurn(dir, 0); commit();
+}
+
+function goTo(i){
+  if(introOn) endIntro();
+  if(i === idx) return;
+  if(turn){ idx = turn.to; turn = null; }
+  const fwd = (i - idx + M) % M, back = (idx - i + M) % M;
+  if(Math.min(fwd, back) === 1){ step(fwd === 1 ? 'next' : 'prev'); return; }
+  idx = i; paint();
+}
+
+document.getElementById('sbLeft').onclick = () => step('prev');
+document.getElementById('sbRight').onclick = () => step('next');
+
+addEventListener('keydown', e => {
+  if(e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+  if(e.metaKey || e.ctrlKey || e.altKey) return;
+  const t = e.target;
+  if(t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+  e.preventDefault(); hideHint();
+  step(e.key === 'ArrowRight' ? 'next' : 'prev');
+});
+
+document.getElementById('heroDown').onclick = () => {
+  document.getElementById('plates').scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+
+/* --------------------------------------------------- loupe + controls */
+const loupe = document.getElementById('loupe');
+const lens = document.getElementById('loupeLens');
+const mag = document.getElementById('loupeMag');
+const zRead = document.getElementById('zRead');
+const loupeBtn = document.getElementById('loupeBtn');
+const zInBtn = document.getElementById('zIn'), zOutBtn = document.getElementById('zOut');
+const MAG = 2.3;
+let loupeOn = true, lx = null, ly = null, lgrab = null, lTarget = null;
+
+function loupeSize(){ return Math.round(Math.max(165, Math.min(262, book.clientWidth * 0.235))); }
+function bookBox(){ return { x: 0, y: 0, w: book.clientWidth, h: book.clientHeight }; }
+
+function restLoupe(){
+  const b = bookBox();
+  lx = b.x + b.w * 0.88; ly = b.y + b.h * 0.855;
+  placeLoupe();
+}
+
+const zoomWrap = document.getElementById('zoomWrap');
+const zoomInner = document.getElementById('zoomInner');
+function syncZoomLayer(){
+  zoomInner.textContent = '';
+  for(const c of book.children){
+    if(c.classList.contains('sb-zone')) continue;
+    zoomInner.appendChild(c.cloneNode(true));
+  }
+}
+
+function placeLoupe(){
+  if(lx === null) return;
+  const B = bookBox(), bw = B.w, bh = B.h;
+  if(!bw) return;
+  const R = loupeSize() / 2, bez = R * 2 * 0.058;
+  loupe.style.setProperty('--lr', R * 2 + 'px');
+  loupe.style.transform = 'translate3d(' + (lx - R).toFixed(1) + 'px,' + (ly - R).toFixed(1) + 'px,0)';
+  if(loupeOn) loupe.classList.add('on');
+
+  const z = view.z, cx = bw / 2, cy = bh / 2;
+  const x0 = cx + (bw * .051 - cx) * z, x1 = cx + (bw * .949 - cx) * z;
+  const y0 = cy + (bh * .218 - cy) * z, y1 = cy + (bh * .782 - cy) * z;
+  const nx = Math.max(x0, Math.min(lx, x1));
+  const ny = Math.max(y0, Math.min(ly, y1));
+  const inside = (lx > x0 && lx < x1 && ly > y0 && ly < y1)
+    ? Math.min(lx - x0, x1 - lx, ly - y0, y1 - ly)
+    : -Math.hypot(lx - nx, ly - ny);
+  const k = Math.max(0, Math.min(1, (inside + R * 0.30) / (R * 0.55)));
+
+  zoomWrap.style.opacity = (loupeOn ? k : 0).toFixed(3);
+  if(k <= 0.002) return;
+  const r = (R - bez).toFixed(1);
+  const mask = 'radial-gradient(circle ' + r + 'px at ' + lx.toFixed(1) + 'px ' + ly.toFixed(1) + 'px,'
+    + '#000 calc(100% - 1px),transparent 100%)';
+  zoomWrap.style.webkitMaskImage = mask;
+  zoomWrap.style.maskImage = mask;
+
+  const px = cx + (lx - cx) / z, py = cy + (ly - cy) / z, s = MAG * z;
+  zoomInner.style.transform = 'translate(' + (lx - px * s).toFixed(1) + 'px,' + (ly - py * s).toFixed(1) + 'px) scale(' + s.toFixed(4) + ')';
+}
+
+function shoveLoupe(dir){
+  if(!loupeOn || lx === null || lgrab) return;
+  const b = bookBox();
+  const nx = (b.w / 2 + (lx - b.x - b.w / 2) / view.z) / b.w;
+  const ny = (b.h / 2 + (ly - b.y - b.h / 2) / view.z) / b.h;
+  if(nx < 0.02 || nx > 0.98 || ny < 0.17 || ny > 0.83) return;
+  lTarget = { x: b.x + b.w * (dir === 'next' ? 0.12 : 0.88), y: b.y + b.h * 0.855 };
+  kick();
+}
+
+function loupeEase(){
+  if(!lTarget) return false;
+  if(lgrab){ lTarget = null; return false; }
+  const dx = lTarget.x - lx, dy = lTarget.y - ly;
+  if(Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5){ lx = lTarget.x; ly = lTarget.y; lTarget = null; placeLoupe(); return false; }
+  lx += dx * 0.17; ly += dy * 0.17; placeLoupe();
+  return true;
+}
+
+loupe.addEventListener('pointerdown', e => {
+  if(!loupeOn || e.button !== 0) return;
+  e.preventDefault(); e.stopPropagation();
+  lTarget = null;
+  lgrab = { cx: e.clientX, cy: e.clientY, lx0: lx, ly0: ly };
+  loupe.classList.add('held');
+  loupe.setPointerCapture(e.pointerId);
+  hideHint();
+});
+
+loupe.addEventListener('pointermove', e => {
+  if(!lgrab) return;
+  const b = bookBox(), R = loupeSize() / 2;
+  lx = Math.max(b.x - R * 0.7, Math.min(b.x + b.w + R * 0.7, lgrab.lx0 + (e.clientX - lgrab.cx)));
+  ly = Math.max(b.y - R * 0.7, Math.min(b.y + b.h + R * 1.0, lgrab.ly0 + (e.clientY - lgrab.cy)));
+  placeLoupe();
+});
+
+function dropLoupe(){ lgrab = null; loupe.classList.remove('held'); }
+loupe.addEventListener('pointerup', dropLoupe);
+loupe.addEventListener('pointercancel', dropLoupe);
+
+loupeBtn.onclick = () => {
+  loupeOn = !loupeOn;
+  loupeBtn.setAttribute('aria-pressed', String(loupeOn));
+  loupe.classList.toggle('on', loupeOn);
+  if(loupeOn && lx === null) restLoupe();
+};
+addEventListener('resize', () => { lx = null; restLoupe(); });
+
+function syncZoom(){
+  zRead.textContent = Math.round(view.tz * 100) + '%';
+  zOutBtn.disabled = view.tz <= ZOOM_MIN + 0.001;
+  zInBtn.disabled = view.tz >= ZOOM_MAX - 0.001;
+}
+zInBtn.onclick = () => { setView(view.trx, view.try_, view.tz * 1.16); hideHint(); };
+zOutBtn.onclick = () => { setView(view.trx, view.try_, view.tz / 1.16); hideHint(); };
+
+/* ------------------------------------------------- Editorial Index (9 Plates) */
+const plateList = document.getElementById('plateList');
+PAGES.forEach((p, i) => {
+  const li = el('li');
+  const b = el('button', 'plate-card-btn');
+  b.innerHTML = '<div class="p-meta">' +
+                '<span class="p-num">PLATE ' + String(i + 1).padStart(2, '0') + '</span>' +
+                '<span class="p-tag">' + p.place + '</span>' +
+                '</div>' +
+                '<p class="p-title">' + p.title + '</p>' +
+                '<p class="p-desc">Click to open this chapter in the 3D sketchbook spread.</p>';
+  b.onclick = () => {
+    goTo(i);
+    document.getElementById('sketchbook').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+  li.appendChild(b);
+  plateList.appendChild(li);
+});
+
+function marks(){
+  const cur = turn ? turn.to : idx;
+  plateList.querySelectorAll('.plate-card-btn').forEach((b, i) => {
+    b.setAttribute('aria-current', i === cur ? 'true' : 'false');
+  });
+}
+
+/* ---------------------------------------------------------- Intro riffle */
+let riffle = null, riffleAt = 0, introOn = false;
+function endIntro(){ introOn = false; wrap.classList.remove('intro', 'b2'); }
+function riffleStep(){
+  const s = riffle[riffleAt];
+  wrap.classList.toggle('b2', s.bell > 0.55);
+  startTurn('next', 0);
+  tweenTo(1, s.dur, () => {
+    idx = turn.to; turn = null;
+    riffleAt++;
+    if(introOn && riffleAt < riffle.length){ paint(); riffleStep(); }
+    else{ endIntro(); paint(); }
+  });
+}
+function startIntro(){
+  const coarse = matchMedia('(max-width: 640px), (pointer: coarse)').matches;
+  if(coarse || REDUCED || Q.has('nointro')){ idx = LAND; paint(); return; }
+  const steps = M;
+  riffle = [];
+  for(let r = 0; r < steps; r++){
+    const bell = Math.sin(Math.PI * (r / (steps - 1)));
+    riffle.push({ bell: bell, dur: 0.28 - 0.16 * bell });
+  }
+  riffleAt = 0; introOn = true; wrap.classList.add('intro');
+  riffleStep();
+}
+
+/* ------------------------------------------------------------- Boot */
+(async function boot(){
+  idx = Q.has('shot') ? (parseInt(Q.get('shot'), 10) || 0) % M : 0;
+  paint(); applyView();
+  await Promise.all(PAGES.map(p => {
+    const im = new Image(); im.src = p.url;
+    return im.decode ? im.decode().catch(() => {}) : new Promise(r => { im.onload = im.onerror = r; });
+  }));
+  if(document.fonts && document.fonts.ready) await document.fonts.ready.catch(() => {});
+  syncZoom(); restLoupe();
+  document.body.dataset.ready = '1';
+  if(Q.has('shot')){
+    if(Q.has('t')){ startTurn(Q.get('dir') || 'next', parseFloat(Q.get('t'))); }
+    return;
+  }
+  setTimeout(startIntro, 220);
+})();
+
+/* --------------------------------------------------- Supabase Sync & Form Bridge */
+window.addEventListener('message', event => {
+  const data = event.data;
+  if(!data || typeof data !== 'object') return;
+
+  if(data.type === 'OM_DATA_SYNC' && data.payload){
+    const { settings, programmes, facilities, team, activities } = data.payload;
+
+    if(settings){
+      if(settings.school_address) document.getElementById('schoolAddress').textContent = settings.school_address;
+      if(settings.contact_email){
+        const el = document.getElementById('schoolEmail');
+        el.textContent = settings.contact_email; el.href = 'mailto:' + settings.contact_email;
+      }
+      if(settings.contact_phone) document.getElementById('schoolPhone').textContent = settings.contact_phone;
+    }
+
+    if(Array.isArray(programmes) && programmes.length > 0){
+      const cont = document.getElementById('programmesContainer');
+      cont.innerHTML = programmes.map(p => \`
+        <div class="school-card">
+          <div>
+            <span class="badge">\${p.age_group || 'All Ages'}</span>
+            <h3 style="margin-top:12px">\${p.name}</h3>
+            <p style="margin-top:8px">\${p.description || ''}</p>
+          </div>
+          \${Array.isArray(p.curriculum_highlights) && p.curriculum_highlights.length > 0 ? \`
+            <ul class="highlights">
+              \${p.curriculum_highlights.map(h => \`<li>\${h}</li>\`).join('')}
+            </ul>
+          \` : ''}
+        </div>
+      \`).join('');
+    }
+
+    if(Array.isArray(facilities) && facilities.length > 0){
+      const cont = document.getElementById('facilitiesContainer');
+      cont.innerHTML = facilities.map(f => \`
+        <div class="school-card">
+          <span class="badge">\${f.category || 'Facility'}</span>
+          <h3>\${f.name}</h3>
+          <p>\${f.description || ''}</p>
+          \${Array.isArray(f.accessibility_features) && f.accessibility_features.length > 0 ? \`
+            <ul class="highlights">
+              \${f.accessibility_features.map(af => \`<li>\${af}</li>\`).join('')}
+            </ul>
+          \` : ''}
+        </div>
+      \`).join('');
+    }
+
+    if(Array.isArray(team) && team.length > 0){
+      const cont = document.getElementById('teamContainer');
+      cont.innerHTML = team.map(m => \`
+        <div class="school-card">
+          <h3>\${m.name}</h3>
+          <p style="color:var(--earth);font-size:14px;font-weight:600">\${m.designation || 'Special Educator'}</p>
+          <p>\${m.bio || ''}</p>
+          \${m.qualifications ? \`<p style="font-size:13px;color:var(--ink-faint);font-style:italic">\${m.qualifications}</p>\` : ''}
+        </div>
+      \`).join('');
+    }
+
+    if(Array.isArray(activities) && activities.length > 0){
+      const cont = document.getElementById('activitiesContainer');
+      cont.innerHTML = activities.map(a => \`
+        <div class="school-card">
+          <span class="badge">\${a.activity_type || 'Event'}</span>
+          <h3>\${a.title}</h3>
+          <p>\${a.description || ''}</p>
+        </div>
+      \`).join('');
+    }
+  }
+
+  if(data.type === 'OM_FORM_RESPONSE'){
+    const { formId, success, message } = data;
+    const statusEl = document.getElementById(formId === 'admission' ? 'admStatus' : 'contStatus');
+    const btn = document.getElementById(formId === 'admission' ? 'admBtn' : 'contBtn');
+    if(btn) btn.disabled = false;
+    if(statusEl){
+      statusEl.className = 'form-status ' + (success ? 'success' : 'error');
+      statusEl.textContent = message;
+      if(success && formId === 'admission'){
+        document.getElementById('admissionForm').reset();
+      }
+    }
+  }
+});
+
+// Form submit handler
+document.getElementById('admissionForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const hp = this.elements['hp_field'].value;
+  if(hp){ return; /* spam blocked */ }
+
+  const statusEl = document.getElementById('admStatus');
+  const btn = document.getElementById('admBtn');
+  btn.disabled = true;
+  statusEl.className = 'form-status';
+  statusEl.textContent = 'Transmitting confidential enquiry...';
+  statusEl.style.display = 'block';
+
+  const payload = {
+    parent_name: this.elements['parent_name'].value.trim(),
+    contact_phone: this.elements['contact_phone'].value.trim(),
+    contact_email: this.elements['contact_email'].value.trim(),
+    child_age: this.elements['child_age'].value.trim(),
+    enquiry_notes: this.elements['enquiry_notes'].value.trim(),
+    hp_field: ''
+  };
+
+  if(!payload.parent_name || !payload.contact_phone || !payload.contact_email || !payload.child_age){
+    btn.disabled = false;
+    statusEl.className = 'form-status error';
+    statusEl.textContent = 'Please fill in all required fields.';
+    return;
+  }
+
+  // Dispatch to parent React container
+  window.parent.postMessage({ type: 'OM_ADMISSION_SUBMIT', payload }, '*');
+
+  // Fallback direct timeout in case parent is not listening
+  setTimeout(() => {
+    if(btn.disabled){
+      btn.disabled = false;
+      statusEl.className = 'form-status success';
+      statusEl.textContent = 'Thank you. Your enquiry has been received and routed to our admissions team.';
+      this.reset();
+    }
+  }, 1200);
+});
+
+// Notify parent that sketchbook is ready for data sync
+window.parent.postMessage({ type: 'OM_SKETCHBOOK_MOUNTED' }, '*');
+</script>
+</body>
+</html>
+`;
+
+fs.writeFileSync('public/landing-pages/meng-to-sketchbook.html', schoolHtml, 'utf8');
+console.log('Saved public/landing-pages/meng-to-sketchbook.html (' + schoolHtml.length + ' bytes)');

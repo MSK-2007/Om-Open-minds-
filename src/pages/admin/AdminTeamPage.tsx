@@ -517,3 +517,4 @@ export const AdminTeamPage: React.FC = () => {
     </article>
   );
 };
+

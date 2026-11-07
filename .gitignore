@@ -35,3 +35,7 @@ pnpm-debug.log*
 .DS_Store
 Thumbs.db
 
+# Temporary working files
+temp/
+
+
