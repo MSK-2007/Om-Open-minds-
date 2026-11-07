@@ -1,8 +1,6 @@
 export * from './client';
 export * from './auth.service';
 export * from './enquiries.service';
-export * from './admissions.service';
-export * from './contact.service';
 export * from './programmes.service';
 export * from './facilities.service';
 export * from './team.service';
@@ -11,3 +9,7 @@ export * from './announcements.service';
 export * from './gallery.service';
 export * from './content.service';
 export * from './resources.service';
+export * from './storage.service';
+export * from './dashboard.service';
+export * from './admissions.service';
+export * from './contact.service';

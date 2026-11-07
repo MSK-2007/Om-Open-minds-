@@ -14,7 +14,20 @@ import {
   ContactPage,
   NotFoundPage,
 } from '@/pages/public';
-import { AdminLoginPage, AdminDashboardPage } from '@/pages/admin';
+import {
+  AdminLoginPage,
+  AdminDashboardPage,
+  AdminAdmissionsPage,
+  AdminContactPage,
+  AdminProgrammesPage,
+  AdminFacilitiesPage,
+  AdminTeamPage,
+  AdminActivitiesPage,
+  AdminAnnouncementsPage,
+  AdminGalleryPage,
+  AdminResourcesPage,
+  AdminSettingsPage,
+} from '@/pages/admin';
 import { ProtectedRoute } from './ProtectedRoute';
 import { ROUTES } from '@/config/constants';
 
@@ -96,6 +109,46 @@ export const router = createBrowserRouter([
           {
             path: 'dashboard',
             element: <AdminDashboardPage />,
+          },
+          {
+            path: 'admissions',
+            element: <AdminAdmissionsPage />,
+          },
+          {
+            path: 'contact',
+            element: <AdminContactPage />,
+          },
+          {
+            path: 'programmes',
+            element: <AdminProgrammesPage />,
+          },
+          {
+            path: 'facilities',
+            element: <AdminFacilitiesPage />,
+          },
+          {
+            path: 'team',
+            element: <AdminTeamPage />,
+          },
+          {
+            path: 'activities',
+            element: <AdminActivitiesPage />,
+          },
+          {
+            path: 'announcements',
+            element: <AdminAnnouncementsPage />,
+          },
+          {
+            path: 'gallery',
+            element: <AdminGalleryPage />,
+          },
+          {
+            path: 'resources',
+            element: <AdminResourcesPage />,
+          },
+          {
+            path: 'settings',
+            element: <AdminSettingsPage />,
           },
         ],
       },

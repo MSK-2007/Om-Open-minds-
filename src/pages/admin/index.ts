@@ -1,3 +1,12 @@
 export * from './AdminLoginPage';
 export * from './AdminDashboardPage';
-
+export * from './AdminAdmissionsPage';
+export * from './AdminContactPage';
+export * from './AdminProgrammesPage';
+export * from './AdminFacilitiesPage';
+export * from './AdminTeamPage';
+export * from './AdminActivitiesPage';
+export * from './AdminAnnouncementsPage';
+export * from './AdminGalleryPage';
+export * from './AdminResourcesPage';
+export * from './AdminSettingsPage';

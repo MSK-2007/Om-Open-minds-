@@ -64,6 +64,76 @@ export const galleryService = {
   },
 
   /**
+   * Create a new gallery category (Admin only).
+   */
+  async createGalleryCategory(input: CreateGalleryCategoryInput): Promise<{ data: GalleryCategory | null; error: Error | null }> {
+    if (!env.isSupabaseConfigured) {
+      return { data: null, error: new Error('Supabase is not configured.') };
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('gallery_categories')
+        .insert(input)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return { data: data as unknown as GalleryCategory, error: null };
+    } catch (err) {
+      return {
+        data: null,
+        error: err instanceof Error ? err : new Error('Failed to create gallery category.'),
+      };
+    }
+  },
+
+  /**
+   * Update an existing gallery category (Admin only).
+   */
+  async updateGalleryCategory(id: string, input: Partial<CreateGalleryCategoryInput>): Promise<{ data: GalleryCategory | null; error: Error | null }> {
+    if (!env.isSupabaseConfigured) {
+      return { data: null, error: new Error('Supabase is not configured.') };
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('gallery_categories')
+        .update(input)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return { data: data as unknown as GalleryCategory, error: null };
+    } catch (err) {
+      return {
+        data: null,
+        error: err instanceof Error ? err : new Error('Failed to update gallery category.'),
+      };
+    }
+  },
+
+  /**
+   * Delete a gallery category (Admin only).
+   */
+  async deleteGalleryCategory(id: string): Promise<{ error: Error | null }> {
+    if (!env.isSupabaseConfigured) {
+      return { error: new Error('Supabase is not configured.') };
+    }
+
+    try {
+      const { error } = await supabase.from('gallery_categories').delete().eq('id', id);
+      if (error) throw error;
+      return { error: null };
+    } catch (err) {
+      return {
+        error: err instanceof Error ? err : new Error('Failed to delete gallery category.'),
+      };
+    }
+  },
+
+  /**
    * Fetch all gallery items including draft and unconsented items (Admin only).
    */
   async getAllGalleryItemsAdmin(): Promise<{ data: GalleryItem[] | null; error: Error | null }> {

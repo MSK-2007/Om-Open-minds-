@@ -1,14 +1,31 @@
-import React, { useEffect, useState, ReactNode } from 'react';
+import React, { useEffect, useState, ReactNode, useCallback } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
 import { authService } from '@/services/supabase/auth.service';
 import { LoginCredentials } from '@/types/auth.types';
+import { AdminProfile } from '@/types/database.types';
 import { AuthContext } from './AuthContext';
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [profile, setProfile] = useState<AdminProfile | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<AuthError | Error | null>(null);
+
+  const loadProfile = useCallback(async (userId: string) => {
+    try {
+      const { profile: adminProfile } = await authService.getAdminProfile(userId);
+      setProfile(adminProfile);
+    } catch {
+      setProfile(null);
+    }
+  }, []);
+
+  const refreshProfile = useCallback(async () => {
+    if (user?.id) {
+      await loadProfile(user.id);
+    }
+  }, [user, loadProfile]);
 
   useEffect(() => {
     let isMounted = true;
@@ -22,6 +39,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           }
           setSession(currentSession);
           setUser(currentSession?.user ?? null);
+          if (currentSession?.user?.id) {
+            await loadProfile(currentSession.user.id);
+          }
           setIsLoading(false);
         }
       } catch (err) {
@@ -34,10 +54,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     initializeAuth();
 
-    const { data: authSubscription } = authService.onAuthStateChange((_event, newSession) => {
+    const { data: authSubscription } = authService.onAuthStateChange(async (_event, newSession) => {
       if (isMounted) {
         setSession(newSession);
         setUser(newSession?.user ?? null);
+        if (newSession?.user?.id) {
+          await loadProfile(newSession.user.id);
+        } else {
+          setProfile(null);
+        }
         setIsLoading(false);
       }
     });
@@ -46,12 +71,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       isMounted = false;
       authSubscription?.subscription?.unsubscribe();
     };
-  }, []);
+  }, [loadProfile]);
 
   const signIn = async (credentials: LoginCredentials) => {
     setIsLoading(true);
     setError(null);
-    const { user: authedUser, session: authedSession, error: authError } = await authService.signIn(credentials);
+    const { user: authedUser, session: authedSession, profile: authedProfile, error: authError } = await authService.signIn(credentials);
     if (authError) {
       setError(authError);
       setIsLoading(false);
@@ -59,6 +84,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
     setUser(authedUser);
     setSession(authedSession);
+    setProfile(authedProfile);
     setIsLoading(false);
     return { error: null };
   };
@@ -68,6 +94,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     await authService.signOut();
     setUser(null);
     setSession(null);
+    setProfile(null);
     setIsLoading(false);
   };
 
@@ -76,11 +103,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       value={{
         user,
         session,
+        profile,
         isLoading,
         error,
         isAuthenticated: !!user,
         signIn,
         signOut,
+        refreshProfile,
       }}
     >
       {children}

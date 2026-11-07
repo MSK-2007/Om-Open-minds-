@@ -225,6 +225,25 @@ export const enquiriesService = {
   },
 
   /**
+   * Delete an admission enquiry (Super Admin Only).
+   */
+  async deleteAdmissionEnquiry(id: string): Promise<{ error: Error | null }> {
+    if (!env.isSupabaseConfigured) {
+      return { error: new Error('Supabase is not configured.') };
+    }
+
+    try {
+      const { error } = await supabase.from('admission_enquiries').delete().eq('id', id);
+      if (error) throw error;
+      return { error: null };
+    } catch (err) {
+      return {
+        error: err instanceof Error ? err : new Error('Failed to delete admission enquiry.'),
+      };
+    }
+  },
+
+  /**
    * Retrieve general contact messages with optional status filter (Admin Only).
    */
   async getContactEnquiries(statusFilter?: ContactEnquiryStatus): Promise<{
@@ -287,6 +306,25 @@ export const enquiriesService = {
       return {
         data: null,
         error: err instanceof Error ? err : new Error('Failed to update contact enquiry status.'),
+      };
+    }
+  },
+
+  /**
+   * Delete a contact enquiry (Super Admin Only).
+   */
+  async deleteContactEnquiry(id: string): Promise<{ error: Error | null }> {
+    if (!env.isSupabaseConfigured) {
+      return { error: new Error('Supabase is not configured.') };
+    }
+
+    try {
+      const { error } = await supabase.from('contact_enquiries').delete().eq('id', id);
+      if (error) throw error;
+      return { error: null };
+    } catch (err) {
+      return {
+        error: err instanceof Error ? err : new Error('Failed to delete contact enquiry.'),
       };
     }
   },
