@@ -1,7 +1,42 @@
 /**
- * OM OPEN MINDS - Baseline Accessibility & Reset Styles (Phase 1)
- * Neutral baseline styles. No decorative design, brand colours, or animations.
+ * OM OPEN MINDS — Authoritative Design System Styles (Phase 5)
+ * Neo-Brutalist Playful & Accessible Visual System
  */
+
+:root {
+  --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Colors */
+  --color-bg: #FFFDF5;
+  --color-fg: #1E293B;
+  --color-muted: #F1F5F9;
+  --color-muted-fg: #64748B;
+  --color-primary: #8B5CF6;
+  --color-secondary: #F472B6;
+  --color-tertiary: #FBBF24;
+  --color-quaternary: #34D399;
+  --color-border: #E2E8F0;
+  --color-card: #FFFFFF;
+  --color-input: #FFFFFF;
+  --color-ring: #8B5CF6;
+  --color-outline: #1E293B;
+
+  /* Borders & Shadows */
+  --border-dark: 2px solid #1E293B;
+  --shadow-default: 4px 4px 0px #1E293B;
+  --shadow-hover: 6px 6px 0px #1E293B;
+  --shadow-active: 2px 2px 0px #1E293B;
+  --shadow-mobile: 2px 2px 0px #1E293B;
+  --shadow-lg: 8px 8px 0px #1E293B;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-pill: 9999px;
+}
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -10,18 +45,210 @@
 html, body {
   margin: 0;
   padding: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  color: #0f172a;
-  background-color: #ffffff;
-  line-height: 1.5;
+  font-family: var(--font-body);
+  color: var(--color-fg);
+  background-color: var(--color-bg);
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
-/* Ensure focus is clearly visible for all keyboard navigators */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  color: var(--color-fg);
+  margin-top: 0;
+  line-height: 1.25;
+}
+
+h1 { font-weight: 800; }
+h2, h3 { font-weight: 700; }
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Ensure focus is clearly visible for keyboard navigators */
 :focus-visible {
-  outline: 3px solid #0284c7 !important;
-  outline-offset: 2px !important;
+  outline: 3px solid var(--color-primary) !important;
+  outline-offset: 3px !important;
+}
+
+/* Neo-Brutalist Card Primitives */
+.neo-card {
+  background-color: var(--color-card);
+  border: var(--border-dark);
+  box-shadow: var(--shadow-default);
+  border-radius: var(--radius-lg);
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease;
+}
+
+.neo-card-interactive:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.neo-card-interactive:active {
+  transform: translate(2px, 2px);
+  box-shadow: var(--shadow-active);
+}
+
+/* Neo-Brutalist Buttons */
+.neo-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: var(--color-primary);
+  color: #FFFFFF;
+  border: var(--border-dark);
+  box-shadow: var(--shadow-default);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 15px;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+  min-height: 48px;
+  text-decoration: none;
+}
+
+.neo-btn-primary:hover:not(:disabled) {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-hover);
+  background-color: #7c3aed;
+  color: #FFFFFF;
+}
+
+.neo-btn-primary:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: var(--shadow-active);
+}
+
+.neo-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #FFFFFF;
+  color: var(--color-fg);
+  border: var(--border-dark);
+  box-shadow: var(--shadow-default);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 15px;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+  min-height: 48px;
+  text-decoration: none;
+}
+
+.neo-btn-secondary:hover:not(:disabled) {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-hover);
+  background-color: var(--color-tertiary);
+  color: var(--color-fg);
+}
+
+.neo-btn-secondary:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: var(--shadow-active);
+}
+
+/* Neo-Brutalist Badges / Stickers */
+.neo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-heading);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid #1E293B;
+  box-shadow: 2px 2px 0px #1E293B;
+  background-color: #FFFFFF;
+  color: #1E293B;
+}
+
+.neo-badge-primary { background-color: var(--color-primary); color: #FFFFFF; }
+.neo-badge-secondary { background-color: var(--color-secondary); color: #1E293B; }
+.neo-badge-tertiary { background-color: var(--color-tertiary); color: #1E293B; }
+.neo-badge-quaternary { background-color: var(--color-quaternary); color: #1E293B; }
+
+/* Input Styling */
+.neo-input {
+  width: 100%;
+  padding: 12px 16px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--color-fg);
+  background-color: var(--color-input);
+  border: var(--border-dark);
+  border-radius: var(--radius-md);
+  box-shadow: 2px 2px 0px #1E293B;
+  outline: none;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.neo-input:focus {
+  box-shadow: 4px 4px 0px var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* Background Patterns */
+.bg-dots {
+  background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+  background-size: 20px 20px;
+}
+
+.bg-stripes {
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(226, 232, 240, 0.4),
+    rgba(226, 232, 240, 0.4) 10px,
+    rgba(241, 245, 249, 0.4) 10px,
+    rgba(241, 245, 249, 0.4) 20px
+  );
+}
+
+/* Marquee for Announcements */
+@keyframes marqueeLeft {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.marquee-container {
+  overflow: hidden;
+  white-space: nowrap;
+  display: flex;
+}
+
+.marquee-content {
+  display: inline-flex;
+  animation: marqueeLeft 25s linear infinite;
+}
+
+.marquee-content:hover {
+  animation-play-state: paused;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .neo-card {
+    box-shadow: var(--shadow-mobile);
+  }
+  .neo-btn-primary, .neo-btn-secondary {
+    box-shadow: var(--shadow-mobile);
+    padding: 10px 18px;
+    font-size: 14px;
+  }
 }
 
 /* Respect user's reduced motion preferences */
@@ -32,5 +259,10 @@ html, body {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+  .marquee-content {
+    animation: none !important;
+  }
+  .neo-card-interactive:hover, .neo-btn-primary:hover, .neo-btn-secondary:hover {
+    transform: none !important;
+  }
 }
-

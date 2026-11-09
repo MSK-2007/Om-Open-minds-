@@ -7,7 +7,7 @@ import { ACCESSIBILITY } from '@/config/constants';
 /**
  * Public Layout Component.
  * Wraps all public-facing school website routes.
- * Enforces semantic layout and accessibility landmarks.
+ * Enforces semantic layout, accessibility landmarks, and playful neo-brutalist styling.
  */
 export const PublicLayout: React.FC = () => {
   return (
@@ -16,12 +16,12 @@ export const PublicLayout: React.FC = () => {
         display: 'flex',
         flexDirection: 'column',
         minHeight: '100vh',
-        backgroundColor: '#ffffff',
-        color: '#0f172a',
-        fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        backgroundColor: '#FFFDF5',
+        color: '#1E293B',
+        fontFamily: 'var(--font-body)',
       }}
     >
-      <SkipToContent targetId={ACCESSIBILITY.SKIP_CONTENT_ID} />
+      <SkipToContent targetId={ACCESSIBILITY.SKIP_CONTENT_ID} label="Skip to school website content" />
       <LiveRegion />
       <Header />
       <main
@@ -30,11 +30,9 @@ export const PublicLayout: React.FC = () => {
         style={{
           flex: 1,
           outline: 'none',
-          padding: '32px 24px',
-          maxWidth: '1200px',
           width: '100%',
-          margin: '0 auto',
-          boxSizing: 'border-box',
+          margin: 0,
+          padding: 0,
         }}
       >
         <Outlet />
@@ -43,4 +41,3 @@ export const PublicLayout: React.FC = () => {
     </div>
   );
 };
-

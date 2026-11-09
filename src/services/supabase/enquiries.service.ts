@@ -74,14 +74,12 @@ export const enquiriesService = {
     }
 
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('admission_enquiries')
-        .insert(sanitizedPayload)
-        .select()
-        .single();
+        .insert(sanitizedPayload);
 
       if (error) throw error;
-      return { data: data as unknown as AdmissionEnquiry, error: null, success: true };
+      return { data: null, error: null, success: true };
     } catch (err) {
       return {
         data: null,
@@ -136,14 +134,12 @@ export const enquiriesService = {
     }
 
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('contact_enquiries')
-        .insert(sanitizedPayload)
-        .select()
-        .single();
+        .insert(sanitizedPayload);
 
       if (error) throw error;
-      return { data: data as unknown as ContactEnquiry, error: null, success: true };
+      return { data: null, error: null, success: true };
     } catch (err) {
       return {
         data: null,

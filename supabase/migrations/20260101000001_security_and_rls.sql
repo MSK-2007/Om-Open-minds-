@@ -9,7 +9,11 @@
 -- =============================================================================
 
 CREATE OR REPLACE FUNCTION public.is_admin()
-RETURNS BOOLEAN AS $$
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, auth, pg_temp
+AS $$
 BEGIN
   RETURN EXISTS (
     SELECT 1 FROM public.admin_profiles
@@ -17,10 +21,14 @@ BEGIN
       AND is_active = true
   );
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
 
 CREATE OR REPLACE FUNCTION public.is_super_admin()
-RETURNS BOOLEAN AS $$
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, auth, pg_temp
+AS $$
 BEGIN
   RETURN EXISTS (
     SELECT 1 FROM public.admin_profiles
@@ -29,10 +37,14 @@ BEGIN
       AND is_active = true
   );
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
 
 CREATE OR REPLACE FUNCTION public.get_admin_role()
-RETURNS TEXT AS $$
+RETURNS TEXT
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, auth, pg_temp
+AS $$
 DECLARE
   user_role TEXT;
 BEGIN
@@ -41,7 +53,7 @@ BEGIN
     AND is_active = true;
   RETURN user_role;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
 
 -- =============================================================================
 -- Enable Row Level Security (RLS) Across All Public Tables

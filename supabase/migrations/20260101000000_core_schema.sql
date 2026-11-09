@@ -10,12 +10,15 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 -- Reusable Trigger: Automatic Updated Timestamp
 -- =============================================================================
 CREATE OR REPLACE FUNCTION public.set_updated_at()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SET search_path = public, pg_temp
+AS $$
 BEGIN
   NEW.updated_at = now();
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$;
 
 -- =============================================================================
 -- Table 1: admin_profiles
@@ -47,8 +50,6 @@ CREATE TABLE IF NOT EXISTS public.site_settings (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
-
-CREATE INDEX IF NOT EXISTS idx_core_pillars_active_order ON public.core_pillars (is_active, display_order);
 
 DROP TRIGGER IF EXISTS trg_site_settings_updated_at ON public.site_settings;
 CREATE TRIGGER trg_site_settings_updated_at
